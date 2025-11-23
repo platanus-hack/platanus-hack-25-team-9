@@ -14,12 +14,6 @@ team-9
 - Alejandro Yung ([@ayungkeiron](https://github.com/ayungkeiron))
 - Matias Berrios ([@m5b6](https://github.com/m5b6))
 
-Before Submitting:
+## Adsombroso
 
-- ✅ Set a project name and description in platanus-hack-project.json
-
-- ✅ Provide a 1000x1000 png project logo, max 500kb
-
-- ✅ Provide a concise and to the point readme.
-
-Have fun! 🚀
+Marketing campaign and ads copilot. generates campaign strategies, ad copy, and targeting recommendations from very simple inputs.
