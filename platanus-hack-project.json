@@ -1,4 +1,5 @@
 {
   "project-name": "Adsombroso",
-  "project-description-spanish": "Adsombroso"
+  "project-description-spanish": "Adsombroso",
+  "deploy-url": "https://hax-blue.vercel.app/"
 }
