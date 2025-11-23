@@ -1,0 +1,132 @@
+"use client";
+
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { WizardLayout } from "@/components/wizard/WizardLayout";
+import { StepIdentity } from "@/components/wizard/StepIdentity";
+import { StepStrategy } from "@/components/wizard/StepStrategy";
+import { StepFinal } from "@/components/wizard/StepFinal";
+import { useWizardStore } from "@/contexts/WizardStore";
+import { SlidePresentation } from "@/components/slides/SlidePresentation";
+import { Slide01Adsombroso } from "@/components/slides/Slide01Adsombroso";
+import { Slide02BigProblem } from "@/components/slides/Slide02BigProblem";
+import { Slide03MoreProblems } from "@/components/slides/Slide03MoreProblems";
+import { Slide04UniversalProblem } from "@/components/slides/Slide04UniversalProblem";
+import { Slide05WhyMeta } from "@/components/slides/Slide05WhyMeta";
+import { Slide06Adsombroso } from "@/components/slides/Slide06Adsombroso";
+
+function WizardContent() {
+    const searchParams = useSearchParams();
+    const initialStep = parseInt(searchParams.get("step") || "0");
+    const [step, setStep] = useState(initialStep);
+    const [showSlides, setShowSlides] = useState(true);
+    const wizardStore = useWizardStore();
+
+    // Update step if URL param changes
+    useEffect(() => {
+        const stepParam = searchParams.get("step");
+        if (stepParam) {
+            setStep(parseInt(stepParam));
+        }
+    }, [searchParams]);
+
+    // Update metadata with current step
+    useEffect(() => {
+        wizardStore.setMetadata({
+            currentStep: step,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [step]);
+
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const businessName = wizardStore.getInput("name") || "";
+
+    const handleNext = () => {
+        setStep((prev) => prev + 1);
+    };
+
+    const steps = [
+        {
+            title: "Cuéntanos sobre tu negocio",
+            subtitle: "Empecemos por lo básico para entender qué ofreces.",
+            component: <StepIdentity onNext={handleNext} onAnalyzingChange={setIsAnalyzing} />,
+        },
+        {
+            title: "Estrategia de Campaña",
+            subtitle: "Definamos a quién vamos a impactar.",
+            component: <StepStrategy onNext={handleNext} />,
+        },
+        {
+            title: "Creando tu campaña",
+            subtitle: "Estamos preparando todo lo que necesitas para tu campaña.",
+            component: <StepFinal />,
+        },
+    ];
+
+    const getStepTitle = (stepIndex: number) => {
+        if (stepIndex === 0) {
+            return businessName ? `Cuéntanos sobre ${businessName}` : "Cuéntanos sobre tu negocio";
+        }
+        return steps[stepIndex]?.title || "";
+    };
+
+    const currentStepData = steps[step] || steps[0];
+
+    // Define the slides
+    const slides = [
+        {
+            id: "slide-01-adsombroso",
+            component: <Slide01Adsombroso />,
+        },
+        {
+            id: "slide-02-big-problem",
+            component: <Slide02BigProblem />,
+        },
+        {
+            id: "slide-03-more-problems",
+            component: <Slide03MoreProblems />,
+        },
+        {
+            id: "slide-04-universal-problem",
+            component: <Slide04UniversalProblem />,
+        },
+        {
+            id: "slide-05-why-meta",
+            component: <Slide05WhyMeta />,
+        },
+        {
+            id: "slide-06-adsombroso",
+            component: <Slide06Adsombroso />,
+        },
+    ];
+
+    // Show slides first, then wizard
+    if (showSlides) {
+        return (
+            <SlidePresentation
+                slides={slides}
+                onComplete={() => setShowSlides(false)}
+            />
+        );
+    }
+
+    return (
+        <WizardLayout
+            currentStep={step}
+            totalSteps={steps.length}
+            title={getStepTitle(step)}
+            subtitle={currentStepData.subtitle}
+            isAnalyzing={isAnalyzing}
+        >
+            {currentStepData.component}
+        </WizardLayout>
+    );
+}
+
+export default function DemoPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <WizardContent />
+        </Suspense>
+    );
+}
